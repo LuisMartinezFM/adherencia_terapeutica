@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adherencia Terapéutica</title>
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<!-- ── Barra superior ───────────────────────────────── -->
+<header class="topbar">
+  <div class="topbar-left">
+    <span class="badge-db">DB</span>
+    <span class="topbar-title">Adherencia Terapéutica</span>
+  </div>
+
+  <div class="topbar-center">
+    <label class="label-field">Paciente</label>
+    <div class="dropdown" id="dropdown">
+      <button class="dropdown-btn" id="dropdown-btn" onclick="toggleDropdown()">
+        <span id="dropdown-label">Todos</span>
+        <span class="dropdown-arrow">▾</span>
+      </button>
+      <ul class="dropdown-menu" id="dropdown-menu">
+        <li class="dropdown-opt" data-value="0"
+            onclick="selectPaciente(0, 'Todos')">Todos</li>
+        {% for u in usuarios %}
+        <li class="dropdown-opt" data-value="{{ u.id_usuario }}"
+            onclick="selectPaciente({{ u.id_usuario }}, '{{ u.nombre }}')">
+          {{ u.nombre }}
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <div class="topbar-right"></div>
+</header>
+
+<!-- ── KPIs ─────────────────────────────────────────── -->
+<section class="kpis" id="kpis">
+  <div class="kpi-card" id="kpi-general">
+    <div class="kpi-label">Adherencia general</div>
+    <div class="kpi-value" id="val-general">—</div>
+  </div>
+  <div class="kpi-card" id="kpi-online">
+    <div class="kpi-label">Online</div>
+    <div class="kpi-value" id="val-online">—</div>
+  </div>
+  <div class="kpi-card" id="kpi-offline">
+    <div class="kpi-label">Offline</div>
+    <div class="kpi-value" id="val-offline">—</div>
+  </div>
+  <div class="kpi-card kpi-neutro" id="kpi-tiempo">
+    <div class="kpi-label">Tiempo respuesta</div>
+    <div class="kpi-value" id="val-tiempo">—</div>
+  </div>
+  <div class="kpi-card kpi-historico" id="kpi-hist">
+    <div class="kpi-label">Histórica</div>
+    <div class="kpi-value" id="val-hist">—</div>
+  </div>
+</section>
+
+<!-- ── Cuerpo ────────────────────────────────────────── -->
+<main class="main-grid">
+
+  <section class="panel panel-cal">
+    <div class="panel-header">
+      <div class="fraccion" id="fraccion">—/—</div>
+      <div class="nav-mes-group">
+        <div class="spinner oculto" id="spinner-cal">⟳</div>
+        <div class="nav-mes">
+          <button class="nav-btn" onclick="cambiarMes(-1)">◀</button>
+          <span class="titulo-mes" id="titulo-mes">—</span>
+          <button class="nav-btn" onclick="cambiarMes(1)">▶</button>
+        </div>
+      </div>
+      <div style="min-width:80px"></div>
+    </div>
+
+    <!-- Vista mes -->
+    <div id="vista-mes">
+      <div class="cal-header">
+        <span>Lun</span><span>Mar</span><span>Mié</span>
+        <span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+    </div>
+
+    <!-- Leyenda calendario -->
+    <div class="cal-leyenda">
+      <div class="leyenda-item"><div class="leyenda-dot excelente"></div> Excelente (100%)</div>
+      <div class="leyenda-item"><div class="leyenda-dot bueno"></div> Aceptable (80–99%)</div>
+      <div class="leyenda-item"><div class="leyenda-dot regular"></div> Regular (60–79%)</div>
+      <div class="leyenda-item"><div class="leyenda-dot malo"></div> Mala (&lt; 60%)</div>
+      <div class="leyenda-item"><div class="leyenda-dot sin-datos"></div> Sin datos</div>
+    </div>
+
+    <!-- Vista día -->
+    <div id="vista-dia" class="oculto">
+      <button class="btn-volver" onclick="volverMes()">← Volver al mes</button>
+      <div class="dia-titulo" id="dia-titulo"></div>
+      <div class="dia-resumen" id="dia-resumen"></div>
+      <div class="dia-eventos" id="dia-eventos"></div>
+    </div>
+  </section>
+
+  <section class="panel panel-meds" id="panel-meds">
+    <div class="meds-titulo">Tomas por medicamento</div>
+    <div class="meds-chart" id="meds-chart">
+      <div class="meds-sin-datos" id="meds-sin-datos" style="display:none"><b>SIN DATOS</b></div>
+    </div>
+    <div class="meds-eje" id="meds-eje"></div>
+  </section>
+
+</main>
+
+<script src="/static/js/app.js"></script>
+<script>
+  const INIT_YEAR  = {{ year }};
+  const INIT_MONTH = {{ month }};
+  const INIT_UID   = {{ id_usuario }};
+  initDashboard(INIT_UID, INIT_YEAR, INIT_MONTH);
+</script>
+</body>
+</html>

@@ -1,0 +1,550 @@
+/* =============================================================
+   style.css — Intento 2 · Obsidian Medical
+   Control total. Sin !important. Sin componentes de terceros.
+============================================================= */
+
+/* ── Variables ───────────────────────────────────────────── */
+:root {
+  --bg-base:      #0C0C0F;
+  --bg-surface:   #13131A;
+  --bg-elevated:  #1A1A27;
+  --border:       rgba(255,255,255,0.07);
+  --accent:       #6366F1;
+  --accent-dim:   rgba(99,102,241,0.15);
+  --accent-light: #A5B4FC;
+  --text-primary: #E8E8F0;
+  --text-secondary:#8B8BA8;
+  --text-muted:   #4A4A62;
+  --green:        #10B981;
+  --yellow:       #F59E0B;
+  --red:          #EF4444;
+  --font-ui:      "DM Sans", sans-serif;
+  --font-data:    "Space Mono", monospace;
+  --radius-sm:    6px;
+  --radius-md:    10px;
+  --radius-lg:    14px;
+}
+
+/* ── Reset ───────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  min-height: 100vh;
+}
+
+/* ── Topbar ──────────────────────────────────────────────── */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(19,19,26,0.95);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+/* Título centrado de forma absoluta para no depender del flex */
+.topbar-left {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  pointer-events: none;
+}
+
+/* Selector de paciente — derecha */
+.topbar-center { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+.topbar-right  { display: none; }
+
+.badge-db {
+  font-family: var(--font-data);
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border: 1px solid rgba(99,102,241,0.35);
+  border-radius: 4px;
+}
+
+.topbar-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.label-field {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent-light);
+  font-weight: 500;
+}
+
+/* ── Dropdown — HTML nativo, control total ───────────────── */
+.dropdown { position: relative; }
+
+.dropdown-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 220px;
+  height: 36px;
+  padding: 0 12px;
+  background: var(--bg-elevated);
+  border: 1px solid rgba(99,102,241,0.35);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.dropdown-btn:hover { border-color: var(--accent); }
+
+.dropdown-arrow {
+  color: var(--text-muted);
+  font-size: 11px;
+  transition: transform 0.15s;
+}
+.dropdown.open .dropdown-arrow { transform: rotate(180deg); }
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 100%;
+  background: var(--bg-elevated);
+  border: 1px solid rgba(99,102,241,0.35);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+  z-index: 999;
+  list-style: none;
+  overflow: hidden;
+}
+.dropdown.open .dropdown-menu { display: block; }
+
+.dropdown-opt {
+  padding: 9px 14px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+}
+.dropdown-opt:hover,
+.dropdown-opt.selected {
+  background: var(--accent-dim);
+  color: var(--accent-light);
+}
+
+/* ── KPIs ────────────────────────────────────────────────── */
+.kpis {
+  display: flex;
+  gap: 12px;
+  padding: 16px 24px;
+}
+
+.kpi-card {
+  flex: 1;
+  padding: 16px 20px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+  transition: background 0.3s, border-color 0.3s;
+}
+
+/* Colores umbrales — fondo completo con opacidad */
+.kpi-card.bueno      { background: rgba(31,178,53,0.28);   border-color: rgba(31,178,53,0.7); }
+.kpi-card.regular    { background: rgba(193,173,26,0.28);  border-color: rgba(193,173,26,0.7); }
+.kpi-card.malo       { background: rgba(202,48,17,0.32);   border-color: rgba(202,48,17,0.7); }
+.kpi-card.kpi-neutro    { background: var(--bg-surface);   border-color: var(--border); }
+.kpi-card.kpi-historico { background: rgba(99,102,241,0.28); border-color: rgba(99,102,241,0.7); }
+
+.kpi-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.kpi-value {
+  font-family: var(--font-data);
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+/* ── Layout principal ────────────────────────────────────── */
+.main-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+  padding: 0 24px 24px;
+}
+
+.panel {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+}
+
+/* ── Panel calendario ────────────────────────────────────── */
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.nav-mes-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fraccion {
+  font-family: var(--font-data);
+  font-size: 13px;
+  color: var(--text-muted);
+  min-width: 80px;
+}
+
+.nav-mes {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 13px;
+  padding: 4px 11px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.nav-btn:hover { border-color: var(--accent); color: var(--accent-light); }
+
+.titulo-mes {
+  font-family: var(--font-data);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.04em;
+  min-width: 170px;
+  text-align: center;
+}
+
+/* Spinner — fijo a la izquierda del nav, no desplaza */
+.spinner {
+  position: absolute;
+  left: -32px;
+  font-family: var(--font-data);
+  font-size: 16px;
+  color: var(--accent);
+  animation: spin 0.8s linear infinite;
+  width: 20px;
+  text-align: center;
+}
+.spinner.oculto { visibility: hidden; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Calendario */
+.cal-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 4px;
+  text-align: center;
+}
+.cal-header span {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 4px 0;
+}
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.dia-cell {
+  aspect-ratio: 5 / 2;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity 0.1s, transform 0.1s;
+  position: relative;
+  overflow: hidden;
+}
+.dia-cell:hover { opacity: 0.82; transform: scale(1.03); }
+
+.dia-cell.excelente { background: #2C3340; border: 1px solid rgba(176,190,197,0.35); }
+.dia-cell.bueno     { background: #1E6B2A; }
+.dia-cell.regular   { background: #7A6210; }
+.dia-cell.malo      { background: #7A2010; }
+.dia-cell.sin-datos { background: var(--bg-elevated); cursor: default; }
+.dia-cell.vacio     { background: transparent; cursor: default; }
+
+/* Número — esquina superior izquierda, siempre blanco */
+.dia-num {
+  position: absolute;
+  top: 5px;
+  left: 7px;
+  font-family: var(--font-data);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  color: rgba(255,255,255,0.90);
+}
+.dia-cell.sin-datos .dia-num { color: var(--text-muted); }
+
+/* Porcentaje — centrado, medium, blanco siempre */
+.dia-pct {
+  font-family: var(--font-data);
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.90);
+}
+.dia-cell.excelente .dia-pct { color: #B0BEC5; }
+.dia-cell.sin-datos .dia-pct { color: var(--text-muted); }
+
+/* Leyenda de colores */
+.cal-leyenda {
+  display: flex;
+  gap: 20px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.leyenda-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: var(--font-ui);
+}
+
+.leyenda-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.leyenda-dot.excelente { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.35); }
+.leyenda-dot.bueno     { background: #1A4D22; border: 1px solid rgba(31,178,53,0.4); }
+.leyenda-dot.regular   { background: #4A3E08; border: 1px solid rgba(193,173,26,0.4); }
+.leyenda-dot.malo      { background: #4A1508; border: 1px solid rgba(202,48,17,0.4); }
+.leyenda-dot.sin-datos { background: var(--bg-elevated); border: 1px solid var(--border); }
+
+/* ── Vista día ───────────────────────────────────────────── */
+.btn-volver {
+  background: none;
+  border: 1px solid rgba(99,102,241,0.35);
+  color: var(--accent-light);
+  padding: 5px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 12px;
+  font-family: var(--font-ui);
+  margin-bottom: 14px;
+  transition: border-color 0.15s;
+}
+.btn-volver:hover { border-color: var(--accent); }
+
+.dia-titulo {
+  font-family: var(--font-data);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+}
+
+.dia-resumen {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 14px;
+}
+
+.dia-eventos { display: flex; flex-direction: column; gap: 8px; }
+
+.evento-row {
+  display: grid;
+  grid-template-columns: 60px 1fr 80px 70px 70px;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid transparent;
+}
+.evento-row.tomado   { border-left-color: var(--green); }
+.evento-row.omitido  { border-left-color: var(--red); }
+
+.evento-hora  { font-family: var(--font-data); font-size: 13px; color: var(--text-primary); }
+.evento-estado{
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.evento-estado.tomado  { color: var(--green); }
+.evento-estado.omitido { color: var(--red); }
+.evento-casilla { font-family: var(--font-data); font-size: 12px; color: var(--text-muted); }
+.evento-modo    { font-size: 12px; color: var(--text-muted); }
+.evento-min     { font-family: var(--font-data); font-size: 12px; color: var(--text-secondary); text-align: right; }
+
+/* ── Scrollbar ───────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--bg-base); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+/* ── Utilidad ────────────────────────────────────────────── */
+.oculto { display: none; }
+
+
+/* ── Gráfica medicamentos HTML/CSS ───────────────────────── */
+.panel-meds {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.meds-titulo {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-align: center;
+  padding-bottom: 4px;
+}
+
+.meds-chart {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  gap: 6px;
+  position: relative;
+}
+
+.meds-sin-datos {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-ui);
+  font-size: 16px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.2);
+  letter-spacing: 0.08em;
+}
+
+.meds-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 28px;
+  position: relative;
+}
+
+.meds-label {
+  font-family: var(--font-data);
+  font-size: 11px;
+  color: rgba(255,255,255,0.55);
+  width: 24px;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.meds-bar-wrap {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  border-radius: 4px;
+  overflow: visible;
+  position: relative;
+}
+
+.meds-bar-tomadas {
+  background: #5457C8;
+  height: 100%;
+  border-radius: 4px 0 0 4px;
+  flex-shrink: 0;
+  transition: width 0.4s ease;
+  min-width: 0;
+}
+
+.meds-bar-omitidas {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.1);
+  height: 100%;
+  border-radius: 0 4px 4px 0;
+  flex-shrink: 0;
+  transition: width 0.4s ease;
+  min-width: 0;
+}
+
+/* Nombre medicamento — debajo de la barra roja */
+.meds-nombre {
+  position: absolute;
+  bottom: -16px;
+  left: 0;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  color: rgba(255,255,255,0.45);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* Etiqueta x/y — pegada al borde derecho de la barra azul */
+.meds-etiqueta {
+  font-family: var(--font-data);
+  font-size: 12px;
+  color: rgba(255,255,255,0.65);
+  white-space: nowrap;
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  transform: translateY(-50%);
+}
+
+/* Eje X */
+.meds-eje {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 0 0 32px;
+  font-family: var(--font-data);
+  font-size: 10px;
+  color: rgba(255,255,255,0.25);
+}
