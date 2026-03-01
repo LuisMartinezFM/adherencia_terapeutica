@@ -1,4 +1,6 @@
-# DB Adherencia Terapéutica
+# Adherencia Terapéutica
+
+![Dashboard demo](docs/img/dashboard_demo.gif)
 
 Sistema de análisis de adherencia terapéutica construido sobre datos reales de un pastillero IoT.
 
@@ -6,9 +8,7 @@ Sistema de análisis de adherencia terapéutica construido sobre datos reales de
 
 ## Contexto
 
-Mi proyecto de tesis de la universidad consistio en el desarroollo y construccion de un pastillero IOT, y pense en 
-desarrollo de un sistema de análisis de datos para analizar la adherencia de pacientes a medicamentos para demostrar
-el como el analisis de datos puede ser utilizado en un proyecto real. Es un pastillero físico con 6 casillas controlado por un ESP32. El hardware registra cada evento de toma — si el paciente confirmó, a qué hora, y si estaba conectado o en modo offline.
+Mi proyecto de tesis de la universidad consistio en el desarroollo y construccion de un pastillero IOT, y pense en desarrollo de un sistema de análisis de datos para analizar la adherencia de pacientes a medicamentos para demostrar el como el analisis de datos puede ser utilizado en un proyecto real. Es un pastillero físico con 6 casillas controlado por un ESP32. El hardware registra cada evento de toma — si el paciente confirmó, a qué hora, y si estaba conectado o en modo offline.
 
 El pipeline completo de integración está diseñado así:
 
@@ -17,8 +17,6 @@ ESP32 → Blynk → Webhook → Flask (servidor) → PostgreSQL
 ```
 
 El hardware y la arquitectura de integración existen. **La conexión end-to-end entre el ESP32 y PostgreSQL es la siguiente iteración del proyecto** — el trabajo actual se enfocó en resolver la capa de datos correctamente antes de conectar el hardware.
-
-Este proyecto construye todo desde PostgreSQL hacia arriba: modelo relacional, pipeline analítico y dashboard. El dataset usado es ficticio pero diseñado para replicar fielmente los patrones de datos que generaría el hardware real.
 
 ---
 
@@ -81,7 +79,7 @@ Los datos provienen de usuarios de prueba del sistema real. Para proteger su pri
 
 **1,769 eventos** cubriendo: casillas reutilizadas, tratamientos temporales finalizados, 3 frecuencias de toma distintas, modo online y offline.
 
-> Los datos fueron generados con un script Python de seed fija para garantizar reproducibilidad. Los patrones de adherencia reflejan comportamientos reales de uso del sistema.
+> Los datos provienen de usuarios de prueba del sistema real con pseudónimos y medicamentos censurados para proteger su privacidad.
 
 ---
 
@@ -101,19 +99,25 @@ Los datos provienen de usuarios de prueba del sistema real. Para proteger su pri
 ## Estructura del proyecto
 
 ```
-analisis_adherencia_terapeutica/
-├── config/
-│   └── database.py          # SQLAlchemy engine
-├── data/
-│   └── queries.py           # SQL parametrizados — sin lógica Python
-├── services/
-│   └── pipeline.py          # Caché + orquestación de queries
-├── templates/
-│   └── index.html           # Jinja2
-├── static/
-│   ├── css/style.css        # Obsidian Medical theme
-│   └── js/app.js            # Estado + fetch + render
-└── app.py                   # Flask + rutas API
+adherencia_terapeutica/
+├── dashboard/
+│   ├── app.py                   # Flask + rutas API
+│   ├── config/
+│   │   └── database.py          # SQLAlchemy engine
+│   ├── data/
+│   │   └── queries.py           # SQL parametrizados
+│   ├── services/
+│   │   └── pipeline.py          # Caché + orquestación
+│   ├── templates/
+│   │   └── index.html           # Jinja2
+│   └── static/
+│       ├── css/style.css        # Obsidian Medical theme
+│       └── js/app.js            # Estado + fetch + render
+├── sql/
+│   └── ddl_adherencia.sql       # Modelo relacional completo
+└── docs/
+    └── img/
+        └── dashboard_demo.gif
 ```
 
 ---
@@ -134,7 +138,7 @@ analisis_adherencia_terapeutica/
 # Instalar dependencias
 pip install -r requirements.txt
 
-# Configurar variables de entorno
+# Crear archivo .env con tus credenciales (ver .env.example)
 DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=db_adherencia_terapeutica
@@ -142,7 +146,7 @@ DB_USER=...
 DB_PASSWORD=...
 
 # Ejecutar
-python app.py
+python dashboard/app.py
 ```
 
 El dashboard queda en `http://localhost:5000`.
@@ -153,7 +157,7 @@ El dashboard queda en `http://localhost:5000`.
 
 **Por qué Flask y no Dash:** Dash usa react-select para el dropdown con clases CSS dinámicas que no se pueden sobrescribir desde hojas de estilos externas. Flask + HTML nativo da control total sobre cada elemento visual.
 
-**Por qué la gráfica de medicamentos es HTML/CSS y no Plotly:** Plotly ignoraba el `range` definido en el layout de forma inconsistente — las barras aparecían comprimidas independientemente de la configuración. Un `div` con `width: X%` relativo al máximo real del dataset es más predecible.
+**Por qué la gráfica de medicamentos es HTML/CSS y no Plotly:** Plotly ignoraba el `range` definido en el layout de forma inconsistente. Un `div` con `width: X%` relativo al máximo real del dataset es más predecible.
 
 **Por qué el histórico es inmutable:** nunca se elimina un tratamiento. Se cambia `estado_tratamiento = 'finalizado'` y se libera la casilla. Esto permite análisis temporal sin perder contexto histórico.
 
@@ -161,6 +165,6 @@ El dashboard queda en `http://localhost:5000`.
 
 ## Siguientes pasos
 
-- Empaquetado como `.exe` con PyInstaller para uso sin dependencias visibles
-- Protección de acceso con contraseña para distribución
+- Conexión end-to-end ESP32 → PostgreSQL
+- Empaquetado como `.exe` con PyInstaller
 - Módulo de predicción de abandono terapéutico con scikit-learn
